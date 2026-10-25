@@ -3,7 +3,7 @@
 import { Solver } from '../client/solver.js'
 
 const [, , email, password] = process.argv
-const solver = new Solver({ baseUrl: 'https://your-app.vercel.app', apiKey: 'cs_xxx' })
+const solver = new Solver({ baseUrl: 'https://captchasolverr.vercel.app', apiKey: 'cs_xxx' })
 
 const DISCORD_SITEKEY = 'f5561ba9-8f1e-40ca-9b5b-a0b3f719ef34'
 
