@@ -7,5 +7,8 @@
     "api/keys.js": { "maxDuration": 15, "memory": 256 },
     "api/settings.js": { "maxDuration": 15, "memory": 256 },
     "api/auth.js": { "maxDuration": 15, "memory": 256 }
-  }
+  },
+  "rewrites": [
+    { "source": "/login", "destination": "/login.html" }
+  ]
 }

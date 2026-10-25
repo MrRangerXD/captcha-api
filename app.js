@@ -1,6 +1,7 @@
 const $ = (s) => document.querySelector(s)
 const $$ = (s) => [...document.querySelectorAll(s)]
 const base = location.origin
+const isLoginPage = location.pathname === '/login' || location.pathname.endsWith('/login')
 
 let adminToken = localStorage.getItem('cs_token') || ''
 let config = {}
@@ -23,17 +24,33 @@ async function req(path, { method = 'GET', body, admin = true } = {}) {
 }
 
 /* ---------- gate ---------- */
-function showGate() { $('#gate').classList.remove('hidden'); $('#app').classList.add('hidden') }
-function showApp() { $('#gate').classList.add('hidden'); $('#app').classList.remove('hidden') }
+function showGate() {
+  const gate = $('#gate')
+  if (gate) gate.classList.remove('hidden')
+  const app = $('#app')
+  if (app) app.classList.add('hidden')
+}
+
+function showApp() {
+  const gate = $('#gate')
+  if (gate) gate.classList.add('hidden')
+  const app = $('#app')
+  if (app) app.classList.remove('hidden')
+}
 
 async function boot() {
   const s = await req('/api/auth', { admin: false })
   if (s.setup) { $('#setupForm').classList.remove('hidden'); $('#gateSub').textContent = 'Pehli baar — admin password banao.' }
   else if (adminToken) {
     const v = await req('/api/auth').catch(() => null)
-    if (v?.ok) { showApp(); return init() }
+    if (v?.ok) {
+      if (isLoginPage) return window.location.href = '/'
+      showApp(); return init()
+    }
     showGate()
-  } else { $('#loginForm').classList.remove('hidden') }
+  } else {
+    $('#loginForm').classList.remove('hidden')
+  }
 }
 
 $('#doSetup').onclick = async () => {
@@ -43,6 +60,7 @@ $('#doSetup').onclick = async () => {
   const r = await req('/api/auth', { method: 'POST', body: { action: 'setup', password: a }, admin: false })
   if (!r.ok) return $('#gateErr').textContent = r.error
   adminToken = r.token; localStorage.setItem('cs_token', r.token)
+  if (isLoginPage) return window.location.href = '/'
   showApp(); init()
 }
 
@@ -50,6 +68,7 @@ $('#doLogin').onclick = async () => {
   const r = await req('/api/auth', { method: 'POST', body: { action: 'login', password: $('#loginPw').value }, admin: false })
   if (!r.ok) return $('#gateErr').textContent = r.error
   adminToken = r.token; localStorage.setItem('cs_token', r.token)
+  if (isLoginPage) return window.location.href = '/'
   showApp(); init()
 }
 
