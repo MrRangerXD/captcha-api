@@ -38,7 +38,19 @@ export default async function handler(req, res) {
   res.status(405).json({ ok: false })
 }
 
-async function requireAdminSilent(req) {
+async function getSession(req) {
+  const token = req.headers['x-admin-token']
+  if (!token) return null
   const { store } = await import('../lib/redis.js')
-  return store.get(`session:${req.headers['x-admin-token']}`)
+  return store.get(`session:${token}`)
+}
+
+function parseBody(req) {
+  if (req.body && typeof req.body === 'object') return req.body
+  if (!req.body || typeof req.body !== 'string') return {}
+  try { return JSON.parse(req.body) } catch { return {} }
+}
+
+async function requireAdminSilent(req) {
+  return getSession(req)
 }

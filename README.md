@@ -6,16 +6,19 @@ Own API, own keys, own dashboard. Runs on Vercel.
 ## Stack
 - Headless Chromium (@sparticuz/chromium + puppeteer-core)
 - OpenRouter free vision model (default: `openrouter/free`)
-- Upstash Redis (config + tasks + stats)
+- Local SQLite database file (`captcha.db`) for config, tasks, and stats
+- No Redis required
 - Vanilla HTML/CSS/JS dashboard
 
 ## Deploy
 1. `npm install`
 2. `npx vercel link && npx vercel --prod`
-3. Vercel Dashboard -> Storage -> Upstash Redis -> Connect
+3. Set `DB_PATH=./captcha.db`, `ADMIN_PASSWORD`, `API_KEYS`, and `OPENROUTER_KEY` in your environment
 4. Site kholo -> admin password banao
 5. Settings -> OpenRouter key paste -> Save
 6. API Keys -> Generate
+
+> The app uses a local `.db` file by default. Redis is not required.
 
 ## Endpoints
 | Method | Path | Auth |
