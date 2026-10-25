@@ -1,0 +1,13 @@
+{
+  "name": "captcha-solver",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "engines": { "node": ">=20" },
+  "dependencies": {
+    "@sparticuz/chromium": "^131.0.1",
+    "@upstash/redis": "^1.34.3",
+    "@vercel/functions": "^1.6.0",
+    "puppeteer-core": "^23.11.1"
+  }
+}

@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Captcha Solver — Control Panel</title>
+<link rel="stylesheet" href="/style.css" />
+</head>
+<body>
+
+<div id="gate" class="gate">
+  <div class="gate-card">
+    <div class="logo">⚡ <span>captcha<b>solver</b></span></div>
+    <p class="muted" id="gateSub">Apna self-hosted captcha solver.</p>
+
+    <div id="setupForm" class="hidden">
+      <label>Admin password banao</label>
+      <input type="password" id="setupPw" placeholder="min 6 characters" />
+      <label>Confirm</label>
+      <input type="password" id="setupPw2" placeholder="repeat password" />
+      <button class="btn primary" id="doSetup">Create &amp; Enter</button>
+    </div>
+
+    <div id="loginForm" class="hidden">
+      <label>Admin password</label>
+      <input type="password" id="loginPw" placeholder="••••••••" />
+      <button class="btn primary" id="doLogin">Enter</button>
+    </div>
+
+    <div class="err" id="gateErr"></div>
+  </div>
+</div>
+
+<div id="app" class="app hidden">
+  <aside class="sidebar">
+    <div class="logo small">⚡ <span>captcha<b>solver</b></span></div>
+    <nav>
+      <a class="nav active" data-tab="overview">Overview</a>
+      <a class="nav" data-tab="keys">API Keys</a>
+      <a class="nav" data-tab="playground">Playground</a>
+      <a class="nav" data-tab="discord">Discord</a>
+      <a class="nav" data-tab="settings">Settings</a>
+      <a class="nav" data-tab="logs">Logs</a>
+    </nav>
+    <div class="side-foot">
+      <span class="dot" id="healthDot"></span><span id="healthTxt">checking…</span>
+      <button class="btn ghost tiny" id="logout">Logout</button>
+    </div>
+  </aside>
+
+  <main class="main">
+
+    <!-- OVERVIEW -->
+    <section class="tab active" id="tab-overview">
+      <h1>Overview</h1>
+      <div class="grid4">
+        <div class="stat"><span class="stat-v" id="sTotal">0</span><span class="stat-l">Total solves</span></div>
+        <div class="stat"><span class="stat-v" id="sToday">0</span><span class="stat-l">Today</span></div>
+        <div class="stat"><span class="stat-v" id="sRate">–</span><span class="stat-l">Success rate</span></div>
+        <div class="stat"><span class="stat-v" id="sAvg">–</span><span class="stat-l">Avg solve time</span></div>
+      </div>
+      <div class="card">
+        <h3>Base URL</h3>
+        <div class="copyrow"><code id="baseUrl"></code><button class="btn ghost tiny" data-copy="#baseUrl">copy</button></div>
+        <p class="muted">Apne tools me ye URL + API key use karo. Header: <code>x-api-key</code></p>
+      </div>
+      <div class="card">
+        <h3>Quick test</h3>
+        <pre id="quickCurl" class="code"></pre>
+      </div>
+    </section>
+
+    <!-- KEYS -->
+    <section class="tab" id="tab-keys">
+      <h1>API Keys</h1>
+      <div class="card">
+        <div class="row">
+          <input id="keyLabel" placeholder="label (e.g. discord-bot)" />
+          <button class="btn primary" id="genKey">Generate</button>
+        </div>
+      </div>
+      <div class="card nopad">
+        <table id="keysTable">
+          <thead><tr><th>Key</th><th>Label</th><th>Usage</th><th>Created</th><th></th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- PLAYGROUND -->
+    <section class="tab" id="tab-playground">
+      <h1>Playground</h1>
+      <div class="card">
+        <div class="row">
+          <select id="pgType">
+            <option value="hcaptcha">hCaptcha</option>
+            <option value="recaptcha_v2">reCAPTCHA v2</option>
+            <option value="recaptcha_v3">reCAPTCHA v3</option>
+          </select>
+          <input id="pgSitekey" placeholder="sitekey" />
+        </div>
+        <div class="row">
+          <input id="pgUrl" placeholder="https://example.com/page" />
+          <input id="pgAction" placeholder="action (v3 only)" />
+        </div>
+        <div class="row">
+          <label class="chk"><input type="checkbox" id="pgEnterprise" /> enterprise</label>
+          <label class="chk"><input type="checkbox" id="pgInvisible" /> invisible</label>
+          <button class="btn primary" id="pgRun">Solve</button>
+        </div>
+      </div>
+      <div class="card">
+        <h3>Result <span class="pill" id="pgState">idle</span></h3>
+        <div class="copyrow"><code id="pgToken" class="wrap"></code><button class="btn ghost tiny" data-copy="#pgToken">copy</button></div>
+        <p class="muted" id="pgMeta"></p>
+      </div>
+    </section>
+
+    <!-- DISCORD -->
+    <section class="tab" id="tab-discord">
+      <h1>Discord</h1>
+      <div class="card">
+        <h3>Session cookies <span class="muted">(optional, saved)</span></h3>
+        <textarea id="dcCookies" rows="3" placeholder="__dcfduid=...; __sdcfduid=...; __cfruid=..."></textarea>
+        <p class="muted">Discord pe jane ke liye cookies paste karo — browser me same cookies set hongi, isliye captcha trust zyada milega.</p>
+      </div>
+      <div class="card">
+        <h3>Login</h3>
+        <div class="row">
+          <input id="dcEmail" placeholder="email" />
+          <input id="dcPass" type="password" placeholder="password" />
+        </div>
+        <div class="row">
+          <input id="dcMfa" placeholder="2FA code (agar maange)" />
+          <button class="btn primary" id="dcLogin">Login</button>
+          <button class="btn ghost" id="dcJoin">Login + Join invite</button>
+        </div>
+        <div class="row">
+          <input id="dcInvite" placeholder="invite code (e.g. abc123)" />
+        </div>
+      </div>
+      <div class="card">
+        <h3>Result <span class="pill" id="dcState">idle</span></h3>
+        <pre id="dcOut" class="code"></pre>
+      </div>
+    </section>
+
+    <!-- SETTINGS -->
+    <section class="tab" id="tab-settings">
+      <h1>Settings</h1>
+      <div class="card">
+        <h3>Vision (OpenRouter — free)</h3>
+        <label>OpenRouter API key</label>
+        <input id="setOrKey" type="password" placeholder="sk-or-v1-..." />
+        <label>Model</label>
+        <input id="setModel" placeholder="openrouter/free" />
+        <p class="muted">Default <code>openrouter/free</code> khud ek free vision model choose karta hai. Specific chahiye to <code>nvidia/nemotron-3.5-super-vl:free</code> try karo.</p>
+      </div>
+      <div class="card">
+        <h3>Network</h3>
+        <label>Proxy (optional)</label>
+        <input id="setProxy" placeholder="http://user:pass@host:port" />
+      </div>
+      <div class="card">
+        <h3>Limits</h3>
+        <div class="row">
+          <div class="fld"><label>Requests / minute</label><input id="setRl" type="number" /></div>
+          <div class="fld"><label>Requests / day</label><input id="setDl" type="number" /></div>
+        </div>
+      </div>
+      <div class="card">
+        <h3>Security</h3>
+        <label>Naya admin password (khaali chhodo to same)</label>
+        <input id="setPw" type="password" />
+      </div>
+      <button class="btn primary" id="saveSettings">Save</button>
+    </section>
+
+    <!-- LOGS -->
+    <section class="tab" id="tab-logs">
+      <h1>Recent solves</h1>
+      <div class="card nopad"><table id="logsTable">
+        <thead><tr><th>Time</th><th>Type</th><th>Status</th><th>ms</th><th>Key</th></tr></thead>
+        <tbody></tbody>
+      </table></div>
+    </section>
+
+  </main>
+</div>
+
+<div id="toast" class="toast"></div>
+<script src="/app.js"></script>
+</body>
+</html>
